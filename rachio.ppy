@@ -1,0 +1,83 @@
+import appdaemon.plugins.hass.hassapi as hass
+import datetime
+import time
+import requests
+from requests.auth import HTTPDigestAuth
+m4_include('/home/appdaemon/code/appdaemon/adlib_imports.pyi')
+from rachiopy import Rachio
+from rachiopy import Notification
+
+class rachio(hass.Hass):
+
+  def initialize(self):
+    # self.LOGLEVEL="DEBUG"
+    self.log("rachio App")
+    ADUtils=self.get_app("ADutils")
+    self.zones={}
+    self.webhooks={}
+    self.response_url='https://hass2.hass.dnsalias.com/api/appdaemon/rachio'
+
+    apikey='1925cf63-1a16-4840-8423-8ec6fbf4bee7'
+    r = Rachio(apikey)
+    n = Notification(r)
+
+    info,id=r.person.getInfo()
+    info,info2=r.person.get(id["id"])
+
+    for d in range(len(info2["devices"])):
+      zonecount=0
+      for z in range(len(info2["devices"][d]["zones"])):
+        tempZone=info2["devices"][d]["zones"][z]
+        if tempZone["enabled"]==True:
+          self.zones[tempZone["name"]]={"enabled":tempZone["enabled"],"zoneid":tempZone["id"],"image":tempZone["imageUrl"],"deviceid":info2["devices"][d]['id']}
+          zonecount=zonecount+1
+
+    #self.prettyPrint(self.zones,"",0)       
+
+    h,res=n.getWebhookEventType()
+
+    webhook_name="ZONE_STATUS_EVENT"
+    for h in range(len(res)):
+      self.webhooks[res[h]['name']]={'webhookid':res[h]['id']}
+
+    self.cleanup_webhooks(n,self.zones['Front Boundary']['deviceid'])
+
+    self.log("Registering for {}-{} webhook on device {} at url {}".format(self.webhooks[webhook_name]['webhookid'],webhook_name,self.zones['Front Boundary']['deviceid'],self.response_url))
+    self.register_endpoint(self.handle_webhooks,"rachio")
+    res=n.postWebhook(self.zones["Front Boundary"]["deviceid"],self.zones["Front Boundary"]["zoneid"],self.response_url,[{'id':self.webhooks[webhook_name]['webhookid']}])
+    #self.log("res={}".format(res))
+    h,res=n.getDeviceWebhook(self.zones["Front Boundary"]['deviceid'])
+
+    #self.log("what webhooks are registered - {}".format(res))
+
+    self.log("Preparing to start {}".format(self.zones["Front Boundary"]["zoneid"]))
+
+    r.zone.start(self.zones["Front Boundary"]["zoneid"],30)
+
+
+  def cleanup_webhooks(self,n,device_id):
+    self.log("cleaning up webhooks")
+    h,res=n.getDeviceWebhook(device_id)
+    for wh in range(len(res)):
+      if res[wh]['url'].find(self.response_url)>=0:
+        h,res2=n.deleteWebhook(res[wh]['id'])
+
+  def handle_webhooks(self,data):
+    #self.log("webhook data = {}".format(data))
+    self.log("data[type]={}, data[zoneid]={}, data[zoneName]={}, data[zoneRunState]={}".format(data['type'],data['zoneId'],data['zoneName'],data['zoneRunState']))
+    return "", 200
+
+  def prettyPrint(self,ob,parent,indent):
+    if type(ob) is list or type(ob) is dict:
+      if type(ob) is dict:
+        self.log("{} {}".format(" " * indent,parent))
+        for o in ob:
+          self.prettyPrint(ob[o],o,indent+1)
+      else:
+        self.log("{} {}".format(" " * indent,parent))
+        for i in range(len(ob)):
+          self.prettyPrint(ob[i],parent,indent+1)
+    else:
+      self.log("{} {}-{}".format(" " * indent,parent,ob))
+
+m4_include(/home/appdaemon/code/appdaemon/adlib.pyi)
