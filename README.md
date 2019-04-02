@@ -41,11 +41,15 @@ Installation:
         max: 60
         step: 1
 ```
-The key is the input_numbers entries must be the same as the zone names with the following changes.  
-They must be all lower case
-All spaces must be replaced with _ underscores.
-append _switch to the end of the name.
-
+As of this release the input_numbers entries must be the same as the zone names with the following changes.  
+* They must be all lower case
+* All spaces must be replaced with _ underscores.
+* append _switch to the end of the name.
+```
+example:
+    rachio zone - Front Flowerbed
+    HA entity   - front_flowerbed_switch
+```
 In a future release I will move the names for these into the apps.yaml file so the naming structure
 isn't so stringent.
 
