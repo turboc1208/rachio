@@ -7,9 +7,12 @@ Requirements : rachiopy  https://github.com/rfverbruggen/rachiopy/tree/master/ra
 Other links : Rachio's API documentation   https://rachio.readme.io/docs/getting-started
 
 Things that are helpful to understand.
-1. Rachio thinks of things in a hierarchey
+1. Rachio thinks of things in a hierarchey.
+
   A. Person
+
     a. Device
+    
       1. Zone
       2. Schedule
       3. Notifications
