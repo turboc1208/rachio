@@ -8,23 +8,19 @@ Other links : Rachio's API documentation   https://rachio.readme.io/docs/getting
 
 Things that are helpful to understand.
 1. Rachio thinks of things in a hierarchey.
-
-  A. Person
-
-    a. Device
-    
-      1. Zone
-      2. Schedule
-      3. Notifications
-
-A person can have one or more devices.
-Devices are the controllers that all your sprinkler zones are wired into.
-Devices have Zones, Schedules and Notifications
-Zones are the lowest level rachio knows about.  Zones have physical sprinkler heads attached to them, but rachio doesn't know about those.
-Schedules are setup in the rachio app and tell rachio when to run each zone, how long it's supposed to run.  Schedules also track realtime
+    1. Person
+        1. Device
+            1. Zone
+            1. Schedule
+            1. Notifications
+1. A person can have one or more devices.
+1. Devices are the controllers that all your sprinkler zones are wired into.
+1. Devices have Zones, Schedules and Notifications
+    1. Zones are the lowest level rachio knows about.  Zones have physical sprinkler heads attached to them, but rachio doesn't know about those.
+    1. Schedules are setup in the rachio app and tell rachio when to run each zone, how long it's supposed to run.  Schedules also track realtime
           progress when something is running.  Even a manual "quick run" creates a schedule and tracks it's progress using a schedule.  If you 
           want to find out the current status of a zone, check the currently running schedule.
-Notifications are webhooks that send your app a message when something happens.  You will need some type of async loop that waits for
+    1. Notifications are webhooks that send your app a message when something happens.  You will need some type of async loop that waits for
           messages without blocking the rest of your app to manage these.  Appdaemon provides the rest api or the api I get confused which
           is for which to accomplish this for you.
 
