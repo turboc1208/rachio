@@ -41,18 +41,6 @@ Installation:
         max: 60
         step: 1
 ```
-As of this release the input_numbers entries must be the same as the zone names with the following changes.  
-* They must be all lower case
-* All spaces must be replaced with _ underscores.
-* append _switch to the end of the name.
-```
-example:
-    rachio zone - Front Flowerbed
-    HA entity   - front_flowerbed_switch
-```
-In a future release I will move the names for these into the apps.yaml file so the naming structure
-isn't so stringent.
-
 In your apps.yaml file add the following section with the appropriate substitutions.
 
     rachio:
@@ -60,8 +48,17 @@ In your apps.yaml file add the following section with the appropriate substituti
       module: rachio
       apikey: bunch of letters and numbers you can get from the rachio app
       url: https://my.external.domain.com/api/appdaemon/rachio
+      devices:
+        'Back Away': 
+          switch: input_number.back_away_switch 
+          sensor: binary_sensor.back_away_sensor
+        'Back Left New': 
+          switch: input_number.back_left_new_switch
+          sensor: binary_sensor.back_left_new_sensor
 
 * the url is the address that rachio's cloud servers will send any notifications to.
 * the url has to end with /api/appdaemon/rachio.
 * Whether it's https or http and your domain name are specific to your configuration
-
+* The devices section starts with the name of your rachio zone (this is case sensitive).  
+indented under that are the HA switch names and HA sensor names you setup in your configuration.yaml file earlier.  
+Switches should be input_numbers and sensors should be binary_sensors.
